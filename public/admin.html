@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+
+<title> admin.html </title>
+<meta name="viewport" content="width=device-width" initial-scale="1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Sofia' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Bungee' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Capriola' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style>
+h1{
+font-family: 'Sofia'
+}
+</style>
+<body>
+
+<div class="container-fluid" style="background-color:LightSkyBlue">
+<h1 style="font-family:Bungee" > Menu </h1>
+<div class="dropdown">
+<button class="btn-primary dropdown-toggle" id="menu1" type="button" data-toggle="dropdown"> Choose a page to go to
+<span class="caret"></span></button>
+<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+<li role="presentation"><a role="menuitem" tabindex="-1" href="index.html"> List and search for events </a></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="admin.html"> List venues, Add events and venues </a></li>
+<li role="presentatio" class="divider"></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="home.html"> Go back to the homepage </a></li>
+</ul>
+</div>
+
+<br>
+</div>
+
+<div class="container-fluid" style="background-color:LightGreen;">
+<h1> Add a Venue: </h1>
+
+<form id="myform">
+<div class="row" style="font-family:Capriola">
+<div class="col-sm-2">
+*Venue Name: <input type = "text" id="venuename" name = "venuename"> </div>
+<div class="col-sm-2">
+Venue Postcode: <input type = "text" id="postcode" name = "postcode"></div>
+<div class="col-sm-2">
+Venue Town: <input type = "text" id="venuetown" name = "venuetown"> </div>
+<div class="col-sm-2">
+Venue url: <input type = "text" id="vurl" name = "vurl"> </div>
+<div class="col-sm-2">
+Venue icon: <input type = "text" id="icon" name = "icon"> </div>
+<div class="col-sm-2">
+<input type ="button" value = "Add Venue" onclick = "addvenue()"></div>
+<br>
+<br>
+</div>
+
+</form>
+<br>
+
+<div class="container" id="added"> </div>
+<div class="container" id="rejected" style="color:red"></div>
+</div>
+
+<div class="container-fluid" style="background-color:DarkTurquoise">
+
+<h1> Show all venues here: </h1>
+<div class="row">
+<div class = "col-sm-6">
+<button id="showvenues" onclick = "showvenues(); return false;"> Show venues </button></div>
+<div class="col-sm-6">
+<button id="hidevenues" onclick = "hidevenues()"> Hide venues </button></div>
+<br>
+<div class="container" id="venues" style="font-family:Cinzel; font-weight:bold"></div>
+<br>
+<br>
+</div>
+</div>
+
+<div class="container-fluid" style="background-color:MediumAquaMarine ">
+<h1> Add an event</h1>
+<h3> Choose a venue to add the event to: </h3>
+<select id="selectvenue" name="selectvenue" class="select">
+</select>
+
+<h3> Put in event details here: </h3>
+<form id="addevent">
+<div class="row" style="font-family:Capriola">
+<div class="col-sm-2">
+*Event ID: <input type="text" id="eventid" name="eventid"><br></div>
+<div class="col-sm-2">
+*Event Title: <input type="text" id="eventtitle" name="eventtitle"><br></div>
+<div class="col-sm-2">
+*Event Date: <input type="date" id="eventdate" name="eventdate"><br></div>
+<div class="col-sm-2">
+Event Blurb: <input type="text" id="eventblurb" name="eventblurb"><br></div>
+<div class="col-sm-2">
+Event url: <input type="text" id="eventurl" name="eventurl"><br></div>
+<div class="col-sm-2">
+<input type="button" value="Add Event" onclick="addevent()"></div>
+</div>
+</form>
+<br>
+<br>
+<div id="added1" class="container" style="color:red"></div>
+<div id="rejected1" class="container" style="color:red"></div>
+<br>
+<br>
+<br>
+</div>
+<div class="container">
+* = required
+</div>
+
+
+
+<script>
+$(document).ready(function(){
+//alert("ready")
+$.getJSON("http://127.0.0.1:8090/events2017/venues",
+function(response){
+//alert(JSON.stringify(response))
+var venues1 = response;
+var namelist=[]
+var namelist1=Object.keys(venues1.venues)
+//alert(JSON.stringify(namelist1))
+for(i=0; i< namelist1.length; i++){
+namelist.push(""+namelist1[i])}
+for(i of namelist){
+//alert(i);
+var option1 = document.createElement('option')
+option1.setAttribute("value", ""+i)
+//alert(JSON.stringify(""+venues1.venues[i]["name"]))
+option1.text=""+venues1.venues[i]["name"];
+//var t = document.createTextNode(""+venues1.venues[i]["name"])
+//alert(JSON.stringify(t))
+//option1.appendchild(t);
+//alert(JSON.stringify(option1));
+document.getElementById("selectvenue").appendChild(option1)
+}})})
+$.getJSON("http://127.0.0.1:8090/events2017/authorise",
+function(response){
+//alert(JSON.stringify(response))});
+if(response=="fail"){
+alert("Authentication Needed");
+window.location.replace("http://127.0.0.1:8090/events2017/login.html")}
+else{alert(JSON.stringify(response))}})
+
+
+function addevent(){
+var evenue = document.getElementById("selectvenue").value
+//alert(evenue);
+var eid = document.getElementById("eventid").value;
+var etitle = document.getElementById("eventtitle").value;
+var eblurb = document.getElementById("eventblurb").value;
+var edate = document.getElementById("eventdate").value;
+var eurl = document.getElementById("eventurl").value
+$.post({url: "http://127.0.0.1:8090/events2017/addevent",
+data:{evenue, eid, etitle, eblurb, edate, eurl},
+success:function(response){
+if(response == "no"){document.getElementById("rejected1").innerText = "Could not add event: Not all required fields have been filled"}
+else{
+//alert("done")
+document.getElementById("added1").innerText = response;
+document.getElementById("rejected1").innerText=""
+}
+}})}
+
+
+function addvenue(){
+var vname = document.getElementById("venuename").value;
+var vtown = document.getElementById("venuetown").value;
+var vpcode = document.getElementById("postcode").value;
+var vurl = document.getElementById("vurl").value;
+var vicon = document.getElementById("icon").value;
+$.post({url:"http://127.0.0.1:8090/events2017/addvenue",
+data:{vname, vtown, vpcode, vurl, vicon},
+success: function(response){
+if(response == "no")
+{document.getElementById("rejected").innerText = "Could not add venue: Not all required fields have been filled"}
+else{
+var venue = JSON.parse(response)
+//alert(venue)
+var option2 = document.createElement('option');
+option2.setAttribute("value",""+venue.name);
+option2.text = ""+venue.name;
+//alert(JSON.stringify(option2))
+document.getElementById("selectvenue").appendChild(option2)
+document.getElementById("added").innerText = "Venue Successfully Added";
+document.getElementById("rejected").innerText = ""
+location.reload()
+}}}
+)}
+
+
+function showvenues(){
+$.getJSON("http://127.0.0.1:8090/events2017/venues",
+function(response){
+document.getElementById("venues").innerText = " ";
+//alert(JSON.stringify(response))
+var venues1 = response;
+//alert(venues1.venues)
+//var idlist=[]
+var idlist1=Object.keys(venues1.venues)
+
+for(var i of idlist1){
+//alert(i)
+//var link = document.createElement('a');
+//link.setAttribute("href",""+venues1.venues[i]["url"])
+var newid = ""+i
+//alert(newid)
+var span = document.createElement('span');
+span.setAttribute('class','shown');
+var newid2 = "new"+newid
+span.setAttribute('id', newid2);
+span.innerText = "\n" +"\n" +"\n" + venues1.venues[i]["name"] + "\n" + venues1.venues[i]["postcode"]+ ", " + venues1.venues[i]["town"]+"\n" 
+//+ venues1.venues[i]["url"]+"\n";
+//+venues1.venues[i]["icon"]+"\n";
+link1 = document.createElement('a');
+var href1 = ""+venues1.venues[i]["url"];
+//alert(href1);
+link1.href = href1;
+//alert(JSON.stringify(link1))
+span.appendChild(link1);
+src = "" + venues1.venues[i]["icon"]
+img = document.createElement('img');
+img.src = src
+img.height = 100
+img.width = 100
+//alert(span.id)
+span.appendChild(img);
+span.append("\n")
+span.append("\n")
+document.getElementById("venues").appendChild(span)}})}
+
+
+function hidevenues(){
+document.getElementById("venues").innerText = " "}
+
+
+ 
+
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+
+<title> index.html </title>
+<meta name="viewport" content="width=device-width" initial-scale="1">
+<link rel="stylesheet" href="mystyle.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link href='https://fonts.googleapis.com/css?family=Sofia' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Bungee' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Capriola' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Alegreya Sans' rel='stylesheet'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://api.eventful.com/js/api"></script>
+</head>
+<style>
+h1{
+font-family: 'Sofia'
+}
+.hidden1{
+display: none
+}
+
+{show1{
+display:inline
+}
+
+h2{
+font-family: 'Bungee'
+}
+</style>
+<body>
+
+<div class="container-fluid" style="background-color:LightSkyBlue">
+<h2 style="font-family:Bungee" > Menu </h2>
+<div class="dropdown">
+<button class="btn-primary dropdown-toggle" id="menu1" type="button" data-toggle="dropdown"> Choose a page to go to
+<span class="caret"></span></button>
+<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+<li role="presentation"><a role="menuitem" tabindex="-1" href="index.html"> List and search for events </a></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="admin.html"> List venues, Add events and venues </a></li>
+<li role="presentatio" class="divider"></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="Home.html"> Go back to the homepage </a></li>
+</ul>
+</div>
+<br>
+<br>
+</div>
+
+<div class = "container-fluid" style="background-color:Plum">
+<h1> Search for Events here: </h1>
+
+<form>
+<div class = "row" style="font-family:Capriola">
+<div class="col-xs-4">
+Keyword: <input type = "text" name = "keyword" id="keyword"> </div>
+<div class="col-xs-4">
+Date: <input type = "date" name = "date" id="date1"> </div> 
+<div class="col-xs-2">
+<input type="button" value="Submit" id="submit1" onclick = "submitdata()"> </div>
+<div class="col-xs-2">
+<button onlclick="hideresults()"> Hide Results </button> </div>
+</div>
+
+</form>
+<br>
+<br>
+
+
+<div class="container" id="results" style="font-family:Cinzel; font-weight:bold"> </div>
+<br>
+</div>
+<div class="container-fluid" style="background-color:LightPink">
+
+<h1> Show all events here:</h1>
+<div class="row">
+<div class="col-xs-4">
+<button id="getevents" onclick = "showevents()"> Show Events </button></div> 
+<div class="col-xs-4">
+<button id="hideevents" onclick="hideevents()"> Hide Events </button></div>
+<br>
+</div>
+
+<div class="container" id="events" style="font-family=Alegreya Sans"></div>
+<br>
+<br>
+</div>
+<script>
+//$(document).ready(function(){
+function showevents(){
+$.getJSON("http://127.0.0.1:8090/events2017/events",
+function(response){
+document.getElementById("events").innerText = " "
+//console.log(response);
+//alert(JSON.stringify(response))
+var events1 = response;
+//var idlist = [];
+//var idlist2 =[];
+for (i=0; i < (events1.events).length; i++){
+//alert(JSON.stringify(events1.events[i]["title"]))
+//alert(JSON.stringify(events1.events[i]))
+var span = document.createElement('span');
+//alert("done1")
+span.innerText = "\n"+"\n" + "Title: "+ events1.events[i]["title"]+ "\n" + "Date: " + events1.events[i]["date"]+ "\n" + "Venue name: " + events1.events[i]["venue"]["name"]+"\n"+"\n";
+span.setAttribute('class','show1');
+span.setAttribute('id', "event" +i);
+document.getElementById("events").appendChild(span);
+
+var span2 = document.createElement('span');
+//alert("created")
+span2.innerText = "\n"+"\n" +"Title: "+ events1.events[i]["title"]+ "\n" +"Blurb: "+ events1.events[i]["blurb"] + "\n" + "Date: " + events1.events[i]["date"]+ "\n" + "url: " + events1.events[i]["url"] + "\n" 
++ "Venue: " + JSON.stringify(events1.events[i]["venue"]) + "\n"
+//["name"]+ "\n" + events1.events[i]["venue"]["town"]+", "+events1.events[i]["venue"]["postcode"] + "\n" + events1.events[i]["venue"]["url"] +"\n"+"\n";
+span2.setAttribute('class','hidden1');
+image1 = document.createElement('img')
+link1 = ""+events1.events[i]["venue"]["icon"]
+image1.src =  link1
+image1.height = 100
+image1.width = 100
+span2.append(image1);
+document.getElementById("events").appendChild(span2);
+}
+
+
+$('.hidden1').click(function(){
+//alert("clicked");
+$('.show1').toggle();
+$('.hidden1').toggle()})
+
+$('.show1').click(function(){
+$('.show1').toggle();
+$('.hidden1').toggle();
+})
+
+})}
+
+function submitdata(){
+document.getElementById("results").innerText=""
+var keyword1 = document.getElementById("keyword").value;
+var date1 = document.getElementById("date1").value
+
+$.post({url: "http://127.0.0.1:8090/events2017/results",
+data:{keyword1, date1},
+success:function(response){
+//alert(response)
+//alert(data)
+//document.getElementById("results")="";
+var list = JSON.parse(response);
+//alert(date1)
+   var oArgs = {
+      app_key: "fVSNkjKXfxtxDpsk" ,
+      q: 'music',
+      where: 'UK',
+      keywords: keyword1,
+      "date": date1,
+   };
+   EVDB.API.call("/events/search", oArgs, function(oData) {
+// alert((oData.events.event).length)
+   //var x = oData
+   for(i=0; i<(oData.events.event).length; i++)
+   {e1 = {};
+   v1={}
+   e1["title"] = oData.events.event[i]["title"];
+   e1["date"] = oData.events.event[i]["start_time"];
+   e1["blurb"]=oData.events.event[i]["description"];
+   e1["url"] = oData.events.event[i]["url"];
+   v1["name"] = oData.events.event[i]["venue_name"];
+   v1["town"]=oData.events.event[i]["city_name"];
+   v1["postcode"] = oData.events.event[i]["postal_code"];
+   v1["url"] =oData.events.event[i]["venue_url"];
+   e1["venue"] = v1;
+   //alert(JSON.stringify(e1));
+   //alert(list)
+   list.push(e1)}
+if(list.length==0){document.getElementById("results").innerText = "No results"}
+else{
+
+   //alert(JSON.stringify(list))
+for (i=0; i < list.length; i++){
+//alert(list[i]["title"])
+
+var div1 = document.createElement('span');
+div1.innerText = "\n" + "\n" + "Title: " + list[i]["title"] +  "\n" +"Date: "+ list[i]["date"] + "\n" + "Venue Name: " + list[i]["venue"]["name"] + "\n";
+div1.setAttribute('class','show1');
+div1.setAttribute('id',"result" + i)
+document.getElementById("results").appendChild(div1)
+
+var div2 = document.createElement('span');
+div2.innerText = "\n" + "\n" + "Title: "+ list[i]["title"]+ "\n" + "Blurb: " + list[i]["blurb"] + "\n" + "Date: " + list[i]["date"]+ "\n" + "url: " + list[i]["url"] + "\n" 
++ "Venue: " + list[i]["venue"]["name"]+ "\n" + list[i]["venue"]["town"]+", "+list[i]["venue"]["postcode"] + "\n" + list[i]["venue"]["url"] + "\n" ;
+div2.setAttribute('class','hidden1');
+div2.setAttribute('id',"result2" + i)
+src = "" + list[i]["venue"]["icon"]
+img = document.createElement('img');
+img.src = src
+img.height = 100
+img.width = 100
+//alert(span.id)
+div2.appendChild(img)
+document.getElementById("results").appendChild(div2)}
+
+$('.hidden1').click(function(){
+//alert("clicked");
+$('.show1').toggle();
+$('.hidden1').toggle()})
+
+$('.show1').click(function(){
+$('.show1').toggle();
+$('.hidden1').toggle();
+})
+}})}})}
+
+function hideevents(){
+document.getElementById("events").innerText="";
+location.reload()}
+
+function hideresults(){
+document.getElementById("results").innerText=""}
+
+
+
+
+</script>
+
+
+
+</body>
+</html>

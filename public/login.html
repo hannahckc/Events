@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width" initial-scale="1">
+<link href='https://fonts.googleapis.com/css?family=Sofia' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Bungee' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Capriola' rel='stylesheet'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+</head>
+<style>
+h1{
+font-family: 'Sofia'
+}
+</style>
+<body>
+<div class="container-fluid" style="background-color:LightSkyBlue">
+<h1 style="font-family:Bungee" > Menu </h1>
+<div class="dropdown">
+<button class="btn-primary dropdown-toggle" id="menu1" type="button" data-toggle="dropdown"> Choose a page to go to
+<span class="caret"></span></button>
+<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+<li role="presentation"><a role="menuitem" tabindex="-1" href="index.html"> List and search for events </a></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="admin.html"> List venues, Add events and venues </a></li>
+<li role="presentatio" class="divider"></li>
+<li role="presentation"><a role="menuitem" tabindex="-1" href="home.html"> Go back to the homepage </a></li>
+</ul>
+</div>
+
+<br>
+</div>
+
+<div class="container-fluid" style="background-color:DarkGrey">
+<h1>   Please log in: </h1>
+<br>
+<br>
+<form>
+<div class="row" style="font-family:Capriola">
+<div class="col-xs-5">
+Username: <input type="text" name="username" id="username"> </div>
+<div class="col-xs-5">
+Password: <input type="text" name="password" id="password"> </div>
+<div class="col-xs-2">
+<input type="button" value="Log in" onclick="login()"></div> 
+</form>
+<br>
+</div>
+<br>
+<br>
+</div>
+<br>
+<div class="container-fluid" id="failure" style="color:red">
+</div>
+
+<br>
+<br>
+
+<script>
+function login(){
+//alert("yes");
+var username = document.getElementById("username").value;
+var pword = document.getElementById("password").value;
+//alert(username);
+$.post({url:"http://127.0.0.1:8090/events2017/login2",
+data: {username, pword},
+success: function(response){
+//alert(response)
+document.getElementById("failure").innerText = ""
+//alert("recieved");
+//alert(response)
+if(response === "no"){
+//alert(response1);
+document.getElementById("failure").innerText = "Log in failed: wrong username or password"}
+else{
+var response1 = JSON.parse(response)
+//alert("yes");
+var ip1=response1[0];
+var c1 =response1[1];
+var c2 = ""+c1
+//alert(ip1)
+//alert(c2)
+var in2hours = new Date(new Date().getTime() + 7200000)
+Cookies.set(ip1, c2,{expires: in2hours});
+//alert(Cookies.get(ip1))
+window.location.replace("http://127.0.0.1:8090/events2017/admin.html")
+}}})}
+
+//alert(username);
+//alert(pword)
+
+</script>
+</body>
+</html>
